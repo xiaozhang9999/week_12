@@ -1,0 +1,67 @@
+class NumArray {
+public:
+    NumArray(vector<int>& nums) {
+        data=nums;
+        tree.resize(4*nums.size(),0);
+        buildSegmentTree(0,0,nums.size()-1);
+    }
+    //创建线段树
+    void buildSegmentTree(int Treeindex, int l, int r)
+        {
+            if (l == r) {
+                tree[Treeindex]=data[l];
+                return;
+            }
+            int leftindex = Treeindex*2+1;
+            int rightindex = Treeindex*2+2;
+            int mid = l + (r - l) / 2;
+            buildSegmentTree(leftindex,l,mid);
+            buildSegmentTree(rightindex,mid+1,r);
+            tree[Treeindex]= tree[leftindex]+tree[rightindex];
+        }
+    void update(int index, int val) {
+        data[index] = val;
+	    set(0, 0, data.size() - 1, index, val);
+    }
+    //在以Treeindex为根节点的线段树中更新index处值为e
+    void set(int Treeindex, int l, int r, int index, int e)
+    {
+        if (l == r) {
+            tree[Treeindex] = e;
+            return;
+        }
+        int mid = l + (r - l) / 2;
+        int left = Treeindex*2+1;
+        int right =Treeindex*2+2;
+        if (index <= mid)
+            set(left, l, mid, index, e);
+        else
+            set(right, mid + 1, r, index, e);
+        //更新根节点值
+        tree[Treeindex] = tree[left]+ tree[right];
+    }
+    int sumRange(int left, int right) {
+        return query(0,0,data.size()-1,left,right);
+    }
+    //在以Treeindex的树中[l,r]范围内搜索区间[queryL,queryR]的值
+    int query(int Treeindex, int l, int r, int queryL, int queryR)
+    {
+        if (l == queryL && r == queryR)
+            return tree[Treeindex];
+        int mid = l + (r - l) / 2;
+        int left=Treeindex*2+1;
+        int right=Treeindex*2+2;
+        if (queryL > mid)
+            return query(right, mid + 1, r, queryL, queryR);
+        else if(queryR<=mid)
+            return query(left,l, mid , queryL, queryR);
+        else {
+            int leftresult = query(left, l, mid, queryL, mid);
+            int rightresult = query(right, mid+1,r, mid+1,queryR);
+            return leftresult+rightresult;
+        }  
+    }
+private:
+    vector<int> data;
+    vector<int> tree;
+};
