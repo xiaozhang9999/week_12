@@ -1,0 +1,57 @@
+class Trie {
+public:
+    struct Node{
+        bool isWord;
+        map<char,Node*> next;
+        Node(){isWord=false;}
+    };
+    Node *root=new Node() ;
+    Trie() {
+        this->size=0;
+    }
+    
+    void insert(string word) {
+        Node *cur=root;
+        for(int i=0;i<word.length();i++){
+            char c=word.at(i);
+            map<char,Node*>::iterator pos=cur->next.find(c);
+            if(pos==cur->next.end()){
+                Node* found=new Node();
+                cur->next.insert(make_pair(c,found));
+            }
+            map<char,Node*>::iterator iter=cur->next.find(c);
+            cur=iter->second;
+        }
+        if(!cur->isWord){
+            cur->isWord=true;
+            size++;
+        }
+    }
+    
+    bool search(string word) {
+       Node *cur=root;
+        for(int i=0;i<word.length();i++){
+            char c=word.at(i);
+            map<char,Node*>::iterator pos=cur->next.find(c);
+            if(pos==cur->next.end())
+           return false;
+            cur=pos->second;
+        }
+        return cur->isWord;
+    }
+    
+    bool startsWith(string prefix) {
+        Node *cur=root;
+        for(int i=0;i<prefix.length();i++){
+            char c=prefix.at(i);
+             map<char,Node*>::iterator pos=cur->next.find(c);
+            if(pos==cur->next.end())
+            return false;
+            cur=pos->second;
+        }
+        return true;
+    }
+private:
+   
+    int size;
+};
